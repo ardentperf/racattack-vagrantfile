@@ -28,7 +28,7 @@ EOF
 fi
 
 i=1
-for x in sdc sdd sde sdf; do
+for x in sdc sdd; do
   blkid /dev/$x\*
   if [ $? -ne 0 ]; then
      if [ -b /dev/$x\1 ]; then

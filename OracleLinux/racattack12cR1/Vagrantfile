@@ -26,10 +26,10 @@ NUM_DB_INSTANCES	= 2
 #
 MEMORY_APPLICATION 	= 1500
 MEMORY_LEAF_INSTANCES	= 2200
-MEMORY_DB_INSTANCES	= 3072
+MEMORY_DB_INSTANCES	= 960
 #        
 #size of shared disk in GB
-size_file_to_dbdisk	= 5
+size_file_to_dbdisk	= 3.25
 #
 #############################
 ##### END CUSTOMIZATION #####
@@ -154,7 +154,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         #first shared disk port
         port=2
         #how many shared disk
-        ["1","2","3","4"].each do |disk|
+        ["1","2"].each do |disk|
           file_to_dbdisk = "racattack-shared-disk#{disk}.vdi"
           if !File.exist?(file_to_dbdisk) and NUM_DB_INSTANCES==i
             unless give_info==false

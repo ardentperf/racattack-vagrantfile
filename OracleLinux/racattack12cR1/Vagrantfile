@@ -141,6 +141,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         vb.name = vm_name + "." + Time.now.strftime("%y%m%d%H%M")
         vb.customize ["modifyvm", :id, "--memory", memory_application]
         vb.customize ["modifyvm", :id, "--cpus", num_core]
+        vb.customize ["modifyvm", :id, "--groups", "/collab"]
       end
       config.vm.network :private_network, ip: lanip
     end
@@ -160,6 +161,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         vb.name = vm_name + "." + Time.now.strftime("%y%m%d%H%M")
         vb.customize ["modifyvm", :id, "--memory", memory_leaf_instances]
         vb.customize ["modifyvm", :id, "--cpus", num_core]
+        vb.customize ["modifyvm", :id, "--groups", "/collab"]
       end
       config.vm.network :private_network, ip: lanip
       config.vm.network :private_network, ip: privip
@@ -180,6 +182,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         vb.name = vm_name + "." + Time.now.strftime("%y%m%d%H%M")
         vb.customize ["modifyvm", :id, "--memory", memory_db_instances]
         vb.customize ["modifyvm", :id, "--cpus", num_core]
+        vb.customize ["modifyvm", :id, "--groups", "/collab"]
         if mode == "test"
           #first shared disk port
           port=2

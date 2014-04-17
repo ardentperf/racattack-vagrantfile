@@ -97,7 +97,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "racattack/oracle65"
-  config.vm.box_version = "14.03.29"
+  config.vm.box_version = "14.04.07"
   config.vm.box_check_update = false
 
   ## Virtualbox modifications

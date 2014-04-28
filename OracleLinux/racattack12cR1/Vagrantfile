@@ -5,12 +5,12 @@
 VAGRANTFILE_API_VERSION = "2"
 
 #############################
-## 20140407
+## 20140411
 ## Alvaro Miranda
 ## http://kikitux.net
 ## alvaro at kikitux.net
 #############################
-##### END CUSTOMIZATION #####
+##### BEGIN CUSTOMIZATION #####
 #############################
 #
 #define VM mode (test or build)
@@ -19,23 +19,23 @@ VAGRANTFILE_API_VERSION = "2"
 mode = "test"
 #
 #define number of nodes
-num_application 	= 0
-num_leaf_instances	= 0
-num_db_instances	= 2
+num_APPLICATION 	= 0
+num_LEAF_INSTANCES	= 0
+num_DB_INSTANCES	= 2
 #
 #define number of cores for guest
-num_core=1
+num_CORE=1
 #
 #define memory for each type of node in MBytes
 #
-#for leaf nodes, the minimun can be  2200, otherwise pre-check will fail for
+#for leaf nodes, the minimun can be  2300, otherwise pre-check will fail for
 #automatic ulimit values calculated based on ram
 #
 #for database nodes, the minimum suggested is 3072
 #
-memory_application 	= 1500
-memory_leaf_instances	= 2300
-memory_db_instances	= 960
+memory_APPLICATION 	= 1500
+memory_LEAF_INSTANCES	= 2300
+memory_DB_INSTANCES	= 960
 #        
 #size of shared disk in GB
 size_file_to_dbdisk	= 3.25
@@ -49,21 +49,21 @@ if ["test","build"].include?(ENV['mode'])
 end
 
 if mode == "build"
-  num_application = 0
-  num_leaf_instances = 0
-  num_db_instances = 1
-  num_core = 1
-  memory_db_instances = 350
+  num_APPLICATION = 0
+  num_LEAF_INSTANCES = 0
+  num_DB_INSTANCES = 1
+  num_CORE = 1
+  memory_DB_INSTANCES = 350
 end
 
 nodes=""
-(1..num_application).each do |i|
+(1..num_APPLICATION).each do |i|
  nodes="collaba#{i} #{nodes}"
 end
-(1..num_leaf_instances).each do |i|
+(1..num_LEAF_INSTANCES).each do |i|
  nodes="collabl#{i} #{nodes}"
 end
-(1..num_db_instances).each do |i|
+(1..num_DB_INSTANCES).each do |i|
  nodes="collabn#{i} #{nodes}"
 end
 
@@ -80,7 +80,6 @@ EOF
 cat > /etc/hosts << EOF
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost6 localhost6.localdomain6
-
 EOF
 
 
@@ -121,9 +120,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   if File.directory?("12cR1")
     # our shared folder for oracle 12c installation files
     config.vm.synced_folder "12cR1", "/media/sf_12cR1", :mount_options => ["dmode=775","fmode=775","uid=54320","gid=54321"]
-    if File.file?("12cR1/linuxamd64_12c_grid_1of2.zip")
-      config.vm.provision :shell, :inline => "sh /media/sf_12cR1/cvuqdisk_install.sh"
-    end
   end
 
 
@@ -131,9 +127,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   ## vagrant work up to down, high node goes first
   ## so when node 1 is ready, we can configure rac and all nodes will be up
 
-  (1..num_application).each do |i|
+  (1..num_APPLICATION).each do |i|
     # this is to start machines higher to lower
-    i = num_application+1-i
+    i = num_APPLICATION+1-i
     config.vm.define vm_name = "collaba%01d" % i do |config|
       puts " "
       config.vm.hostname = "#{vm_name}.racattack"
@@ -141,17 +137,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       puts vm_name + " eth1 lanip  :" + lanip
       config.vm.provider :virtualbox do |vb|
         vb.name = vm_name + "." + Time.now.strftime("%y%m%d%H%M")
-        vb.customize ["modifyvm", :id, "--memory", memory_application]
-        vb.customize ["modifyvm", :id, "--cpus", num_core]
+        vb.customize ["modifyvm", :id, "--memory", memory_APPLICATION]
+        vb.customize ["modifyvm", :id, "--cpus", num_CORE]
         vb.customize ["modifyvm", :id, "--groups", "/collab"]
       end
       config.vm.network :private_network, ip: lanip
     end
   end
 
-  (1..num_leaf_instances).each do |i|
+  (1..num_LEAF_INSTANCES).each do |i|
     # this is to start machines higher to lower
-    i = num_leaf_instances+1-i
+    i = num_LEAF_INSTANCES+1-i
     config.vm.define vm_name = "collabl%01d" % i do |config|
       puts " "
       config.vm.hostname = "#{vm_name}.racattack"
@@ -161,8 +157,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       puts vm_name + " eth2 privip :" + privip
       config.vm.provider :virtualbox do |vb|
         vb.name = vm_name + "." + Time.now.strftime("%y%m%d%H%M")
-        vb.customize ["modifyvm", :id, "--memory", memory_leaf_instances]
-        vb.customize ["modifyvm", :id, "--cpus", num_core]
+        vb.customize ["modifyvm", :id, "--memory", memory_LEAF_INSTANCES]
+        vb.customize ["modifyvm", :id, "--cpus", num_CORE]
         vb.customize ["modifyvm", :id, "--groups", "/collab"]
       end
       config.vm.network :private_network, ip: lanip
@@ -170,9 +166,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 
-  (1..num_db_instances).each do |i|
+  (1..num_DB_INSTANCES).each do |i|
     # this is to start machines higher to lower
-    i = num_db_instances+1-i
+    i = num_DB_INSTANCES+1-i
     config.vm.define vm_name = "collabn%01d" % i do |config|
       puts " "
       config.vm.hostname = "#{vm_name}.racattack"
@@ -182,8 +178,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       puts vm_name + " eth2 privip :" + privip
       config.vm.provider :virtualbox do |vb|
         vb.name = vm_name + "." + Time.now.strftime("%y%m%d%H%M")
-        vb.customize ["modifyvm", :id, "--memory", memory_db_instances]
-        vb.customize ["modifyvm", :id, "--cpus", num_core]
+        vb.customize ["modifyvm", :id, "--memory", memory_DB_INSTANCES]
+        vb.customize ["modifyvm", :id, "--cpus", num_CORE]
         vb.customize ["modifyvm", :id, "--groups", "/collab"]
         if mode == "test"
           #first shared disk port
@@ -191,7 +187,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           #how many shared disk
           ["1","2"].each do |disk|
             file_to_dbdisk = "racattack-shared-disk#{disk}.vdi"
-            if !File.exist?(file_to_dbdisk) and num_db_instances==i
+            if !File.exist?(file_to_dbdisk) and num_DB_INSTANCES==i
               unless give_info==false
                 puts "on first boot shared disks will be created, this will take some time"
                 give_info=false
@@ -213,6 +209,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         puts vm_name + " dns server role is master"
         config.vm.provision :shell, :inline => "sh /media/stagefiles/named_master.sh"
         if ENV['setup'] and File.file?("12cR1/linuxamd64_12c_grid_1of2.zip")
+          config.vm.provision :shell, :inline => "sh /media/sf_12cR1/cvuqdisk_install.sh"
+	  config.vm.provision :shell, :inline => "unzip -o /media/sf_12cR1/linuxamd64_12c_grid_1of2.zip -d /u01/stage grid/sshsetup/sshUserSetup.sh"
           setupssh="sh /media/sf_12cR1/sshUserSetup.sh #{nodes}"
           config.vm.provision :shell, :inline => setupssh
         end
@@ -220,6 +218,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       if vm_name == "collabn2" 
         puts vm_name + " dns server role is slave"
         config.vm.provision :shell, :inline => "sh /media/stagefiles/named_slave.sh"
+        if ENV['setup'] and File.file?("12cR1/linuxamd64_12c_grid_1of2.zip")
+          config.vm.provision :shell, :inline => "sh /media/sf_12cR1/cvuqdisk_install.sh"
+        end
       end
     end
   end

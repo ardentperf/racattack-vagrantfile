@@ -44,7 +44,9 @@ else
   exit 1
 fi
 
-sed -i -e 's/Defaults\s*requiretty$/#Defaults\trequiretty/' /etc/sudoers
+cp /etc/sudoers /etc/sudoers.ori
+sed -i -e 's/^Defaults\s*requiretty$/#Defaults\trequiretty/' /etc/sudoers
+grep '^%oinstall' /etc/sudoers || echo '%oinstall        ALL=(ALL)       NOPASSWD: ALL' >> /etc/sudoers
 
 cp /etc/fstab /etc/fstab.ori
 
@@ -63,16 +65,6 @@ egrep -v "net.bridge.bridge-nf-call" /etc/sysctl.conf.ori > /etc/sysctl.conf
 [ $1 ] && ARG=$1 || ARG="empty"
 
 if [ $ARG == "rac" ] ;then
-  [ -f /media/sf_12cR1/linuxamd64_12c_grid_1of2.zip ] && unzip -o /media/sf_12cR1/linuxamd64_12c_grid_1of2.zip -d /u01/stage grid/rpm/cvuqdisk-1.0.9-1.rpm
-  [ -f /media/sf_12cR1/linuxamd64_12c_grid_1of2.zip ] && unzip -o /media/sf_12cR1/linuxamd64_12c_grid_1of2.zip -d /u01/stage grid/sshsetup/sshUserSetup.sh
-  rpm -q cvuqdisk 2>/dev/null >/dev/null
-  if [ $? -eq 0 ]; then
-    echo "cvuqdisk found"
-  else
-    if [ -f /u01/stage/grid/rpm/cvuqdisk-1.0.9-1.rpm ] ; then
-      yum --disableplugin='*' -C --disablerepo='*' localinstall -y /u01/stage/grid/rpm/cvuqdisk-1.0.9-1.rpm
-    fi
-  fi
   ifconfig eth2 2>/dev/null >/dev/null
   if [ $? -eq 0 ];then
     RP_ETH2="net.ipv4.conf.eth2.rp_filter=2"
